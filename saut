@@ -1,0 +1,184 @@
+-- Services
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Interface
+local gui = Instance.new("ScreenGui")
+gui.Name = "TeleportUI"
+gui.ResetOnSpawn = false
+gui.Parent = game.CoreGui
+
+-- Frame principale
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 280, 0, 200)
+frame.Position = UDim2.new(0.05, 0, 0.3, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+local uICorner = Instance.new("UICorner")
+uICorner.CornerRadius = UDim.new(0, 10)
+uICorner.Parent = frame
+
+-- Barre titre
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 40)
+titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = frame
+
+local titleText = Instance.new("TextLabel")
+titleText.Text = "discord.gg/807shop"
+titleText.Size = UDim2.new(1, -80, 1, 0)
+titleText.Position = UDim2.new(0, 10, 0, 0)
+titleText.BackgroundTransparency = 1
+titleText.TextColor3 = Color3.new(1, 1, 1)
+titleText.Font = Enum.Font.GothamBold
+titleText.TextScaled = true
+titleText.Parent = titleBar
+
+-- Bouton Minimiser
+local btnMinimize = Instance.new("TextButton")
+btnMinimize.Text = "−"
+btnMinimize.Size = UDim2.new(0, 30, 0, 30)
+btnMinimize.Position = UDim2.new(1, -70, 0, 5)
+btnMinimize.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+btnMinimize.TextColor3 = Color3.new(1, 1, 1)
+btnMinimize.Font = Enum.Font.GothamBold
+btnMinimize.TextScaled = true
+btnMinimize.Parent = titleBar
+
+-- Bouton Unload
+local btnUnload = Instance.new("TextButton")
+btnUnload.Text = "×"
+btnUnload.Size = UDim2.new(0, 30, 0, 30)
+btnUnload.Position = UDim2.new(1, -35, 0, 5)
+btnUnload.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+btnUnload.TextColor3 = Color3.new(1, 1, 1)
+btnUnload.Font = Enum.Font.GothamBold
+btnUnload.TextScaled = true
+btnUnload.Parent = titleBar
+
+-- Liste des positions (ordonnée)
+local teleportLocations = {
+    { name = "Monde 0", position = Vector3.new(-10471.5, 2533.0, -65.5) },
+    { name = "Monde Lune", position = Vector3.new(-5120.5, 6204.9, 129.1) },
+    { name = "Monde Lava", position = Vector3.new(-48.7, 8734.9, 130.0) },
+    { name = "Monde Glace", position = Vector3.new(5022.4, 13429.9, 138.6) },
+    { name = "Monde Fleur", position = Vector3.new(10096.1, 19189.9, 147.2) },
+    { name = "Monde Neige", position = Vector3.new(15387.0, 27323.3, 160.2) },
+    { name = "Monde Sombre", position = Vector3.new(20505.9, 45653.3, 186.2) },
+    { name = "Monde Vide", position = Vector3.new(25625.6, 64004.3, 212.8) },
+    { name = "Monde Desert", position = Vector3.new(30748.2, 82352.3, 241.8) },
+    { name = "Monde Forêt", position = Vector3.new(35864.6, 102656.3, 273.7) },
+    { name = "Monde Bonbons", position = Vector3.new(40986.9, 122845.3, 303.0) },
+    { name = "Monde Steampunk", position = Vector3.new(46106.2, 143080.2, 332.0) },
+    { name = "Monde Plage", position = Vector3.new(51224.9, 163339.2, 359.8) },
+    { name = "Monde Ciel", position = Vector3.new(56346.1, 183583.2, 391.2) },
+}
+
+-- Valeur de sélection
+local selectedLocation = nil
+
+-- Bouton déroulant (lieux)
+local dropdown = Instance.new("TextButton")
+dropdown.Text = "Sélectionner un lieu"
+dropdown.Size = UDim2.new(0.8, 0, 0, 40)
+dropdown.Position = UDim2.new(0.1, 0, 0, 60)
+dropdown.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+dropdown.TextColor3 = Color3.new(1, 1, 1)
+dropdown.Font = Enum.Font.Gotham
+dropdown.TextScaled = true
+dropdown.Parent = frame
+
+-- Frame options
+local optionsFrame = Instance.new("Frame")
+optionsFrame.Size = UDim2.new(0.8, 0, 0, #teleportLocations * 30)
+optionsFrame.Position = UDim2.new(0.1, 0, 0, 100)
+optionsFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+optionsFrame.Visible = false
+optionsFrame.ZIndex = 5
+optionsFrame.Parent = frame
+
+local uicorner2 = Instance.new("UICorner", optionsFrame)
+uicorner2.CornerRadius = UDim.new(0, 5)
+
+local expanded = false
+
+-- Options
+for i, location in ipairs(teleportLocations) do
+	local btn = Instance.new("TextButton", optionsFrame)
+	btn.Size = UDim2.new(1, 0, 0, 30)
+	btn.Position = UDim2.new(0, 0, 0, (i - 1) * 30)
+	btn.Text = location.name
+	btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.Gotham
+	btn.TextScaled = true
+	btn.ZIndex = 6
+
+	btn.MouseButton1Click:Connect(function()
+		selectedLocation = location
+		dropdown.Text = location.name
+		optionsFrame.Visible = false
+		expanded = false
+	end)
+end
+
+-- Ouvrir/fermer options
+dropdown.MouseButton1Click:Connect(function()
+	expanded = not expanded
+	optionsFrame.Visible = expanded
+end)
+
+-- Bouton TÉLÉPORTER
+local teleportButton = Instance.new("TextButton")
+teleportButton.Text = "TÉLÉPORTER"
+teleportButton.Size = UDim2.new(0.8, 0, 0, 40)
+teleportButton.Position = UDim2.new(0.1, 0, 0, 150)
+teleportButton.BackgroundColor3 = Color3.fromRGB(100, 180, 100)
+teleportButton.TextColor3 = Color3.new(1, 1, 1)
+teleportButton.Font = Enum.Font.GothamBold
+teleportButton.TextScaled = true
+teleportButton.Parent = frame
+
+teleportButton.MouseButton1Click:Connect(function()
+	if selectedLocation then
+		local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+		if hrp then
+			hrp.CFrame = CFrame.new(selectedLocation.position + Vector3.new(0, 10, 0))
+		end
+	end
+end)
+
+-- Minimiser
+local minimized = false
+btnMinimize.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	if minimized then
+		for _, child in ipairs(frame:GetChildren()) do
+			if child ~= titleBar then
+				child.Visible = false
+			end
+		end
+		optionsFrame.Visible = false
+		expanded = false
+		frame.Size = UDim2.new(0, 280, 0, 40)
+		btnMinimize.Text = "+"
+	else
+		for _, child in ipairs(frame:GetChildren()) do
+			child.Visible = true
+		end
+		dropdown.Visible = true
+		teleportButton.Visible = true
+		frame.Size = UDim2.new(0, 280, 0, 200)
+		btnMinimize.Text = "−"
+	end
+end)
+
+-- Unload
+btnUnload.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
