@@ -84,7 +84,7 @@ local selectedLocation = nil
 
 -- Bouton déroulant (lieux)
 local dropdown = Instance.new("TextButton")
-dropdown.Text = "Sélectionner un lieu"
+dropdown.Text = "Select a Monde"
 dropdown.Size = UDim2.new(0.8, 0, 0, 40)
 dropdown.Position = UDim2.new(0.1, 0, 0, 60)
 dropdown.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
@@ -135,7 +135,7 @@ end)
 
 -- Bouton TÉLÉPORTER
 local teleportButton = Instance.new("TextButton")
-teleportButton.Text = "TÉLÉPORTER"
+teleportButton.Text = "TELEPORT"
 teleportButton.Size = UDim2.new(0.8, 0, 0, 40)
 teleportButton.Position = UDim2.new(0.1, 0, 0, 150)
 teleportButton.BackgroundColor3 = Color3.fromRGB(100, 180, 100)
